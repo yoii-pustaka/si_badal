@@ -47,8 +47,7 @@ Route::middleware(['auth', 'role:user'])->group(function () {
         'update' => 'orders.update',
         'destroy' => 'orders.destroy'
     ]);
-    Route::post('orders/{order}/upload-payment', [BadalOrderController::class, 'uploadPaymentProof'])
-        ->name('orders.uploadPayment');
+    Route::post('/orders/{order}/upload-payment', [BadalOrderController::class, 'uploadPaymentProof'])->name('orders.uploadPayment');
 
     // Pembayaran
     Route::get('/orders/{id}/payment', [PaymentController::class, 'create'])->name('payment.create');

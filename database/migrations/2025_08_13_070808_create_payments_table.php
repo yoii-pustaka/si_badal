@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained()->onDelete('cascade');
-            $table->string('payment_proof'); // path file bukti pembayaran
+            $table->string('payment_proof')->nullable(); // path file bukti pembayaran
             $table->foreignId('confirmed_by')->nullable()->constrained('users')->onDelete('set null');
             $table->enum('status', ['pending', 'verified', 'rejected'])->default('pending');
             $table->timestamps();

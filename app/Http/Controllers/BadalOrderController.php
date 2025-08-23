@@ -144,9 +144,6 @@ class BadalOrderController extends Controller
             ]);
         }
 
-        // Update status order
-        $order->update(['status' => 'paid']);
-
         return redirect()->route('orders.show', $order->id)
             ->with('success', 'Bukti pembayaran berhasil diunggah.');
     }

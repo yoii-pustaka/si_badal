@@ -182,7 +182,33 @@
                     </div>
                 </div>
             </div>
-
+            <!-- Payment Proof -->
+            @if($order->payment && $order->payment->payment_proof)
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
+                <div class="px-6 py-4 bg-gradient-to-r from-pink-500 to-pink-600 text-white">
+                    <h3 class="text-lg font-semibold flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2m-5-4l4-4m0 0l4 4m-4-4v12" />
+                        </svg>
+                        Bukti Pembayaran
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-3">
+                        <a href="{{ asset('storage/' . $order->payment->payment_proof) }}" target="_blank"
+                            class="block">
+                            <img src="{{ asset('storage/' . $order->payment->payment_proof) }}"
+                                alt="Bukti Pembayaran"
+                                class="rounded-lg shadow-lg max-h-64 object-contain w-full">
+                        </a>
+                        <p class="text-xs text-gray-500">
+                            Diupload pada: {{ $order->payment->updated_at->format('d M Y H:i') }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            @endif
             <!-- Videos Card -->
             <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
                 <div class="px-6 py-4 bg-gradient-to-r from-red-500 to-red-600 text-white">
@@ -601,21 +627,18 @@
                     </form>
                     @endif
 
+                    <!-- Jika order sudah dibayar, admin bisa assign pelaksana -->
                     @if($order->status === 'paid')
-                    <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST">
-                        @csrf
-                        @method('PATCH')
-                        <input type="hidden" name="status" value="in_progress">
-                        <button type="submit"
-                            onclick="return confirm('Mulai pelaksanaan order ini?')"
-                            class="w-full inline-flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
-                            <svg class="w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                            </svg>
-                            Mulai Pelaksanaan
-                        </button>
-                    </form>
+                    <a href="{{ route('admin.orders.assignForm', $order->id) }}"
+                        class="w-full inline-flex justify-center items-center px-6 py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-xl hover:from-green-700 hover:to-teal-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl font-semibold">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m-6 4v6m6-6v6" />
+                        </svg>
+                        Mulai Pelaksanaan
+                    </a>
                     @endif
+
 
                     @if(in_array($order->status, ['pending', 'paid']))
                     <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\BadalOrder;
 use App\Models\Order;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class AdminOrderController extends Controller
@@ -26,7 +27,7 @@ class AdminOrderController extends Controller
 
     public function verifyPayment($id)
     {
-        $order = \App\Models\Order::findOrFail($id);
+        $order = Order::with('payment')->findOrFail($id);
 
         if ($order->status !== 'paid') {
             return back()->with('error', 'Order ini belum dibayar atau sudah diverifikasi.');
@@ -35,7 +36,10 @@ class AdminOrderController extends Controller
         $order->update([
             'status' => 'in_progress'
         ]);
-
+        $order->payment->update([
+            'status' => 'verified',
+            'confirmed_by' => auth()->id()
+        ]);
         return back()->with('success', 'Pembayaran berhasil diverifikasi. Order masuk tahap pelaksanaan.');
     }
 
@@ -43,7 +47,8 @@ class AdminOrderController extends Controller
     public function assignForm($id)
     {
         $order = Order::findOrFail($id);
-        $pelaksanaList = \App\Models\User::role('pelaksana')->get();
+        $order->update(['status' => 'in_progress']);
+        $pelaksanaList = User::role('pelaksana')->get();
         return view('admin.orders.assign', compact('order', 'pelaksanaList'));
     }
 
@@ -70,8 +75,9 @@ class AdminOrderController extends Controller
             'status' => 'required|in:pending,paid,assigned,done,rejected'
         ]);
 
-        $order = Order::findOrFail($id);
+        $order = Order::with('payment')->findOrFail($id);
         $order->update(['status' => $request->status]);
+        $order->payment->update(['status' => 'verified']);
 
         return back()->with('success', 'Status order diperbarui');
     }
