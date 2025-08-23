@@ -324,7 +324,7 @@
                                 <div class="p-4">
                                     <div class="relative group">
                                         <video controls
-                                            class="w-full h-48 object-cover rounded-lg shadow-sm bg-black"
+                                            class="w-full max-h-96 object-contain rounded-lg shadow-sm bg-black"
                                             preload="metadata">
                                             <source src="{{ asset('storage/' . $video->file_path) }}" type="video/mp4">
                                             <div class="flex items-center justify-center h-48 bg-gray-200 rounded-lg">
