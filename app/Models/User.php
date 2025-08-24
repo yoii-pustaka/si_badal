@@ -44,10 +44,11 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function pelaksanaProfile()
+    public function profile()
     {
-        return $this->hasOne(PelaksanaProfile::class, 'user_id');
+        return $this->hasOne(UserProfile::class);
     }
+
 
     public function orders()
     {

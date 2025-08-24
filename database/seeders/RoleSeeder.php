@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use App\Models\User;
+use App\Models\UserProfile;
 use Illuminate\Support\Facades\Hash;
 
 class RoleSeeder extends Seeder
@@ -12,38 +13,57 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         // Buat roles
-        $adminRole = Role::firstOrCreate(['name' => 'admin']);
-        $pelaksanaRole = Role::firstOrCreate(['name' => 'pelaksana']);
-        $userRole = Role::firstOrCreate(['name' => 'user']);
+        $roles = [
+            'admin',
+            'pelaksana',
+            'user'
+        ];
 
-        // Buat akun admin default
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@example.com'],
+        foreach ($roles as $roleName) {
+            Role::firstOrCreate(['name' => $roleName]);
+        }
+
+        // Daftar akun default
+        $defaultUsers = [
             [
+                'email' => 'admin@example.com',
                 'name' => 'Administrator',
-                'password' => Hash::make('password123')
-            ]
-        );
-        $admin->assignRole($adminRole);
-
-        // Buat akun pelaksana default
-        $pelaksana = User::firstOrCreate(
-            ['email' => 'pelaksana@example.com'],
+                'role' => 'admin',
+            ],
             [
+                'email' => 'pelaksana@example.com',
                 'name' => 'Pelaksana Umroh',
-                'password' => Hash::make('password123')
-            ]
-        );
-        $pelaksana->assignRole($pelaksanaRole);
-
-        // Buat akun user default
-        $user = User::firstOrCreate(
-            ['email' => 'user@example.com'],
+                'role' => 'pelaksana',
+            ],
             [
+                'email' => 'user@example.com',
                 'name' => 'User Pendaftar',
-                'password' => Hash::make('password123')
-            ]
-        );
-        $user->assignRole($userRole);
+                'role' => 'user',
+            ],
+        ];
+
+        foreach ($defaultUsers as $data) {
+            $user = User::firstOrCreate(
+                ['email' => $data['email']],
+                [
+                    'name' => $data['name'],
+                    'password' => Hash::make('password123')
+                ]
+            );
+
+            // Assign role
+            $user->assignRole($data['role']);
+
+            // Pastikan ada profilnya
+            UserProfile::firstOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'full_name' => $data['name'],
+                    'phone' => '08123456789',
+                    'address' => 'Alamat default',
+                    'passport_number' => 'P' . rand(100000, 999999),
+                ]
+            );
+        }
     }
 }

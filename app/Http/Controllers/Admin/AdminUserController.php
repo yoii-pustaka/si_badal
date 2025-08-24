@@ -41,6 +41,17 @@ class AdminUserController extends Controller
         $role = Role::find($request->role_id);
         $user->assignRole($role->name);
 
+        UserProfile::firstOrCreate(
+            ['user_id' => $user->id],
+            [
+                'full_name' => $request->name, // bisa default pakai name user
+                'phone' => null,
+                'address' => null,
+                'passport_number' => null,
+            ]
+        );
+
+
         return redirect()->route('admin.users.index')->with('success', 'User berhasil ditambahkan.');
     }
 
@@ -62,9 +73,15 @@ class AdminUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => "required|email|unique:users,email,{$user->id}",
             'password' => 'nullable|min:6|confirmed',
-            'role_id' => 'required|exists:roles,id'
+            'role_id' => 'required|exists:roles,id',
+            // validasi profile
+            'full_name' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:500',
+            'passport_number' => 'nullable|string|max:100',
         ]);
 
+        // Update user
         $data = $request->only('name', 'email');
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
@@ -74,11 +91,19 @@ class AdminUserController extends Controller
         $role = Role::find($request->role_id);
         $user->syncRoles([$role->name]);
 
+        // Update atau buat profile
+        $user->profile()->updateOrCreate(
+            ['user_id' => $user->id],
+            $request->only('full_name', 'phone', 'address', 'passport_number')
+        );
+
         return redirect()->route('admin.users.index')->with('success', 'User berhasil diperbarui.');
     }
 
+
     public function destroy(User $user)
     {
+        $user->profile()->delete();
         $user->delete();
         return redirect()->route('admin.users.index')->with('success', 'User berhasil dihapus.');
     }

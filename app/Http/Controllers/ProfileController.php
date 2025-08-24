@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\UserProfile;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,34 +12,37 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    /**
-     * Display the user's profile form.
-     */
-    public function edit(Request $request): View
+    public function show()
     {
-        return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
+        $user = UserProfile::where('user_id', auth()->id())->firstOrFail();
+
+        return view('profile.show', compact('user'));
     }
 
     /**
-     * Update the user's profile information.
+     * Form edit profil.
+     */
+    public function edit(Request $request)
+    {
+        $user = UserProfile::where('user_id', auth()->id())->firstOrFail();
+
+        return view('profile.edit', compact('user'));
+    }
+
+    /**
+     * Update profil user_profile, bukan langsung tabel users.
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $profile = UserProfile::where('user_id', auth()->id())->firstOrFail();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
+        $profile->update($request->validated());
 
-        $request->user()->save();
-
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return Redirect::route('profile.show')->with('success', 'Profil berhasil diperbarui.');
     }
 
     /**
-     * Delete the user's account.
+     * Hapus akun + profil user.
      */
     public function destroy(Request $request): RedirectResponse
     {
@@ -46,10 +50,14 @@ class ProfileController extends Controller
             'password' => ['required', 'current_password'],
         ]);
 
-        $user = $request->user();
+        $user = Auth::user();
 
         Auth::logout();
 
+        // hapus profile dulu
+        $user->profile()->delete();
+
+        // hapus akun user
         $user->delete();
 
         $request->session()->invalidate();
