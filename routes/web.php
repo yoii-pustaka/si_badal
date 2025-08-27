@@ -88,9 +88,10 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
     Route::resource('services', ServiceController::class);
 
     // Laporan
-    Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
-    Route::get('reports/export-pdf', [ReportController::class, 'exportPdf'])->name('reports.exportPdf');
-    Route::get('reports/export-excel', [ReportController::class, 'exportExcel'])->name('reports.exportExcel');
+     Route::get('/report', [ReportController::class, 'index'])->name('report');
+    Route::get('/report/export-pdf', [ReportController::class, 'exportPdf'])->name('exportPdf');
+    Route::get('/report/export-csv', [ReportController::class, 'exportCsv'])->name('exportCsv');
+
 
     // Video
     Route::get('videos', [AdminVideoController::class, 'index'])->name('videos.index');

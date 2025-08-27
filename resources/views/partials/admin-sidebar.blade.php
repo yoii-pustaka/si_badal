@@ -142,7 +142,7 @@
                     Analytics
                 </p>
 
-                <a href="{{ route('admin.reports.index') }}"
+                <a href="{{ route('admin.report') }}"
                     class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 hover:bg-gray-700 hover:bg-opacity-50 hover:translate-x-1 {{ request()->routeIs('admin.reports.*') ? 'bg-gradient-to-r from-teal-600 to-cyan-600 shadow-lg shadow-teal-500/25' : '' }}">
                     <div class="flex items-center justify-center w-8 h-8 mr-3 rounded-lg {{ request()->routeIs('admin.reports.*') ? 'bg-white bg-opacity-20' : 'bg-gray-700 group-hover:bg-gray-600' }}">
                         <svg class="w-5 h-5 {{ request()->routeIs('admin.reports.*') ? 'text-white' : 'text-gray-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
